@@ -5,9 +5,9 @@ function injectBase(html, baseHref) {
   return `<!doctype html><html><head><base href="${baseHref}"></head><body>${html}</body></html>`;
 }
 
+
 export async function onRequest(context) {
   const { request, env, params } = context;
-
   const id = params.id;
 
   const segs = Array.isArray(params.path)
@@ -18,71 +18,73 @@ export async function onRequest(context) {
 
   if (!rel) rel = "captcha.html";
 
-  // 1) R2 images – unchanged, good
+  // 1) Dynamic R2 images only – check for ID-specific subpaths
   if (rel.startsWith("assets/")) {
-    const key = `${id}/${rel.replace(/^assets\//, "")}`;
-    const obj = await env.R2.get(key);
-    if (!obj) return new Response("Not found", { status: 404 });
+    const assetSubPath = rel.replace(/^assets\//, "");  // e.g. "solo/1.png" or "heart.png"
 
-    const headers = new Headers();
-    obj.writeHttpMetadata(headers);
-    headers.set("etag", obj.httpEtag);
-    headers.set("cache-control", "public, max-age=31536000, immutable");
-    return new Response(obj.body, { status: 200, headers });
+    // If it's one of your uploaded dynamic files (solo/, couple/), serve from R2
+    if (assetSubPath.startsWith("solo/") || assetSubPath.startsWith("couple/")) {
+      const key = `${id}/${assetSubPath}`;
+      const obj = await env.R2.get(key);
+      if (!obj) return new Response("Not found", { status: 404 });
+
+      const headers = new Headers();
+      obj.writeHttpMetadata(headers);
+      headers.set("etag", obj.httpEtag);
+      headers.set("cache-control", "public, max-age=31536000, immutable");
+      return new Response(obj.body, { status: 200, headers });
+    }
+
+    // Otherwise, fall through to static assets (heart.png, petal.png, etc.)
   }
 
-  // 2) Known pages: fetch via env.ASSETS.fetch with adjusted path
+  // 2) Known pages – unchanged, using env.ASSETS.fetch
   const page = rel.replace(/\.html$/i, "");
   const isKnownPage = page === "captcha" || page === "heart" || page === "celebrate" || page === "yes";
 
   if (isKnownPage) {
-    // Construct URL for the static file at root
     const assetUrl = new URL(request.url);
-    assetUrl.pathname = `/${page}.html`;  // exact file name in your build output
+    assetUrl.pathname = `/${page}.html`;
 
-    // Fetch via ASSETS binding – this is the key fix
     let upstream;
     try {
       upstream = await env.ASSETS.fetch(assetUrl);
     } catch (e) {
-      console.error("ASSETS fetch failed:", e);
-      return new Response("Internal error fetching page", { status: 500 });
+      console.error("ASSETS fetch error:", e);
+      return new Response("Internal error", { status: 500 });
     }
 
-    // Handle any redirects from static side (e.g. /captcha.html → /captcha)
+    // Redirect handling – unchanged
     if (upstream.status >= 300 && upstream.status < 400) {
       let loc = upstream.headers.get("location");
       if (loc && loc.startsWith("/")) {
-        // Rewrite redirect to stay under /c/[id]/
         const headers = new Headers(upstream.headers);
         headers.set("Location", `/c/${id}${loc}`);
         return new Response(null, { status: upstream.status, headers });
       }
     }
 
-    // If not redirect, patch HTML with <base>
     if (upstream.ok && upstream.headers.get("content-type")?.includes("text/html")) {
       let html = await upstream.text();
       const patched = injectBase(html, `/c/${id}/`);
 
       const headers = new Headers(upstream.headers);
       headers.set("content-type", "text/html; charset=utf-8");
-      headers.set("cache-control", "no-store");  // or adjust if you want caching
+      headers.set("cache-control", "no-store");
 
       return new Response(patched, { status: upstream.status, headers });
     }
 
-    // Fallback: just pass through if not HTML or error
     return upstream;
   }
 
-  // 3) Other static files (css/js/etc) – use ASSETS instead of external fetch
+  // 3) All other requests (css/, js/, static assets/*, etc.) – use ASSETS
   const assetUrl = new URL(request.url);
   assetUrl.pathname = `/${rel}`;
 
   const upstream = await env.ASSETS.fetch(assetUrl);
 
-  // Optional: rewrite redirects if any
+  // Redirect rewrite if needed – unchanged
   if (upstream.status >= 300 && upstream.status < 400) {
     let loc = upstream.headers.get("location");
     if (loc && loc.startsWith("/")) {
