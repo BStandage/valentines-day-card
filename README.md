@@ -6,7 +6,7 @@
 A simple interactive Valentine’s Day website you can personalize with your own photos.
 
 No coding required.
-
+ 
 ---
 
 ## Quick Start (5 minutes)
