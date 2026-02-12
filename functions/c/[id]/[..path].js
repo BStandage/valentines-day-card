@@ -1,14 +1,11 @@
 export async function onRequest({ request, env, params }) {
   const id = params.id;
-  const path = params.path || "";
+  const path = (params.path || "").toString(); // can be "" for /c/<id>/
 
-  // 1) Serve per-card images from R2
-  // Your frontend asks for: assets/solo/1.png .. 9.png and assets/couple/couple.png
+  // 1) Per-card images: /c/<id>/assets/... -> R2 key: <id>/...
   if (path.startsWith("assets/")) {
-    // Map /c/<id>/assets/solo/1.png  ->  <id>/solo/1.png in R2
-    // Map /c/<id>/assets/couple/couple.png -> <id>/couple/couple.png in R2
     const rel = path.replace(/^assets\//, ""); // solo/1.png or couple/couple.png
-    const key = `${id}/${rel}`;
+    const key = `${id}/${rel}`;                // <id>/solo/1.png etc.
 
     const obj = await env.R2.get(key);
     if (!obj) return new Response("Not found", { status: 404 });
@@ -16,20 +13,19 @@ export async function onRequest({ request, env, params }) {
     const headers = new Headers();
     obj.writeHttpMetadata(headers);
     headers.set("etag", obj.httpEtag);
-    // Allow caching (safe because ID is immutable)
     headers.set("cache-control", "public, max-age=31536000, immutable");
-
     return new Response(obj.body, { headers });
   }
 
-  // 2) For everything else under /c/<id>/..., serve your static site files
-  // We basically rewrite:
-  //   /c/<id>/         -> /index.html
+  // 2) Everything else: serve static files from the Pages site
+  // Map:
+  //   /c/<id>/           -> /index.html
   //   /c/<id>/heart.html -> /heart.html
-  //   /c/<id>/script.js  -> /script.js
+  //   /c/<id>/css/app.css -> /css/app.css
+  //   /c/<id>/js/index.js  -> /js/index.js
   const url = new URL(request.url);
-  const targetPath = (path === "" ? "index.html" : path);
-  url.pathname = `/${targetPath}`;
+  const target = path === "" ? "index.html" : path;
+  url.pathname = `/${target}`;
 
   return fetch(new Request(url.toString(), request));
 }

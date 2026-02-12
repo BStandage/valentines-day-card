@@ -1,6 +1,10 @@
+export async function onRequestGet() {
+  return new Response("OK. POST multipart/form-data to /api/create", { status: 200 });
+}
+
 export async function onRequestPost({ request, env }) {
   const ct = request.headers.get("content-type") || "";
-  if (!ct.includes("multipart/form-data")) {
+  if (!ct.toLowerCase().includes("multipart/form-data")) {
     return new Response("Expected multipart/form-data", { status: 400 });
   }
 
@@ -16,16 +20,15 @@ export async function onRequestPost({ request, env }) {
     return new Response("Need exactly 9 files under 'solo'", { status: 400 });
   }
 
-  // Basic size guard (tweak as you want)
-  const maxBytes = 5 * 1024 * 1024;
+  // Basic size guard
+  const maxBytes = 5 * 1024 * 1024; // 5MB each
   if (couple.size > maxBytes || solos.some(f => f.size > maxBytes)) {
     return new Response("One or more files too large (max 5MB each)", { status: 413 });
   }
 
-  // Simple ID (URL-safe). Good enough for MVP.
+  // Simple URL-safe ID
   const id = crypto.randomUUID().replaceAll("-", "").slice(0, 12);
 
-  // Helper to store as PNG bytes (we store as-is; user can upload png/jpg; content-type preserved)
   async function put(key, file) {
     await env.R2.put(key, await file.arrayBuffer(), {
       httpMetadata: {
@@ -35,18 +38,17 @@ export async function onRequestPost({ request, env }) {
     });
   }
 
+  // Store couple (force key name to match your frontend expectation)
   await put(`${id}/couple/couple.png`, couple);
 
-  // Keep your existing naming convention 1.png..9.png (but we’re generating them)
+  // Store 9 solo images mapped to 1.png..9.png keys
   for (let i = 0; i < 9; i++) {
     await put(`${id}/solo/${i + 1}.png`, solos[i]);
   }
 
-  // Optional: record created time
+  // Optional metadata
   await env.CARDS.put(`card:${id}`, JSON.stringify({ created: Date.now() }));
 
-  const url = new URL(request.url);
-  const shareUrl = `${url.origin}/c/${id}/`;
-
-  return Response.json({ id, url: shareUrl });
+  const origin = new URL(request.url).origin;
+  return Response.json({ id, url: `${origin}/c/${id}/` });
 }
