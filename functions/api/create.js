@@ -1,3 +1,5 @@
+// functions/api/create.js
+
 export function onRequestGet() {
   return new Response(
     "OK. POST multipart/form-data to /api/create with fields: couple (1 file), solo (9 files).",
@@ -14,6 +16,15 @@ export async function onRequestPost({ request, env }) {
     return new Response("Server misconfigured: KV binding 'CARDS' not available.", { status: 500 });
   }
 
+  // Rate limit: 20 creates per IP per hour (KV)
+  const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+  const rlKey = `rl:${ip}`;
+  const current = parseInt((await env.CARDS.get(rlKey)) || "0", 10);
+  if (current >= 20) {
+    return new Response("Too many uploads from this IP. Try again later.", { status: 429 });
+  }
+  await env.CARDS.put(rlKey, String(current + 1), { expirationTtl: 3600 });
+
   const ct = request.headers.get("content-type") || "";
   if (!ct.toLowerCase().includes("multipart/form-data")) {
     return new Response("Expected multipart/form-data", { status: 400 });
@@ -29,6 +40,12 @@ export async function onRequestPost({ request, env }) {
   }
   if (!Array.isArray(solos) || solos.length !== 9 || !solos.every(f => f instanceof File)) {
     return new Response("Need exactly 9 files under 'solo'", { status: 400 });
+  }
+
+  // Reject non-image uploads
+  const isImage = (f) => (f.type || "").startsWith("image/");
+  if (!isImage(couple) || solos.some(f => !isImage(f))) {
+    return new Response("Only image uploads are allowed.", { status: 415 });
   }
 
   // Size guard
@@ -56,7 +73,7 @@ export async function onRequestPost({ request, env }) {
 
   await env.CARDS.put(`card:${id}`, JSON.stringify({ created: Date.now() }));
 
-  // IMPORTANT: always return the *main* hostname, not a preview/hash hostname
+  // Keep pages.dev as requested
   const shareUrl = `https://valentines-day-card.pages.dev/c/${id}/`;
 
   return Response.json({ id, url: shareUrl });
