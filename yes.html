@@ -73,7 +73,6 @@
                 // Go back to the captcha page for this specific card
                 // Use .html if your function requires it, otherwise clean URL
                 replayBtn.href = `/c/${id}/captcha`;          // clean URL (recommended)
-                // replayBtn.href = `/c/${id}/captcha.html`;  // if you need .html extension
                 replayBtn.textContent = 'Replay';
             } else {
                 // Fallback: if no id found (rare), go to root build page

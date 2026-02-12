@@ -2,7 +2,7 @@ const heartBtn = document.getElementById("heartBtn");
 const burstLayer = document.getElementById("burstLayer");
 const hint = document.getElementById("hint");
 
-const NEXT_PAGE_URL = "celebrate.html";
+const NEXT_PAGE_URL = "celebrate";
 
 // clicks feel good already; keep
 const CLICKS_TO_WIN = 18;

@@ -52,7 +52,7 @@ function buildGrid() {
 verifyBtn.addEventListener("click", () => {
   const remaining = selected.filter(v => !v).length;
   if (remaining === 0) {
-    window.location.href = "heart.html";
+    window.location.href = "heart";
     return;
   }
 
