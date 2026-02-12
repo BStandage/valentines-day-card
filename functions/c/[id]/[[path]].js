@@ -1,24 +1,21 @@
 export async function onRequest({ request, env, params }) {
   const id = params.id;
 
-  // [[path]] comes in as an array of segments for multi-segment matches.
-  // e.g. /c/abc/assets/solo/1.png -> ["assets","solo","1.png"]
-  const segments = Array.isArray(params.path)
+  // [[path]] is usually an array of segments
+  const segs = Array.isArray(params.path)
     ? params.path
     : (params.path ? [params.path] : []);
 
-  const rel = segments.join("/"); // "assets/solo/1.png", "css/app.css", "js/index.js", etc.
+  const rel = segs.join("/"); // e.g. "assets/solo/1.png", "captcha.html", "captcha", "css/app.css"
 
-  // If somehow we got here with no rel, just serve index.html
+  // If somehow called with no rel, just serve index route behavior
   if (!rel) {
-    const url = new URL(request.url);
-    url.pathname = "/index.html";
-    return fetch(new Request(url.toString(), request));
+    const u = new URL(request.url);
+    u.pathname = "/index.html";
+    return fetch(new Request(u.toString(), request));
   }
 
   // 1) Per-card images from R2
-  // /c/<id>/assets/solo/1.png -> R2 key: <id>/solo/1.png
-  // /c/<id>/assets/couple/couple.png -> R2 key: <id>/couple/couple.png
   if (rel.startsWith("assets/")) {
     const r2Key = `${id}/${rel.replace(/^assets\//, "")}`;
 
@@ -29,15 +26,26 @@ export async function onRequest({ request, env, params }) {
     obj.writeHttpMetadata(headers);
     headers.set("etag", obj.httpEtag);
     headers.set("cache-control", "public, max-age=31536000, immutable");
-
     return new Response(obj.body, { status: 200, headers });
   }
 
-  // 2) Everything else: serve your static site files from the Pages root
-  // /c/<id>/css/app.css -> /css/app.css
-  // /c/<id>/js/index.js -> /js/index.js
-  // /c/<id>/heart.html  -> /heart.html
+  // 2) Serve static files from site root, BUT keep URL under /c/<id>/ by rewriting redirects
   const url = new URL(request.url);
   url.pathname = `/${rel}`;
-  return fetch(new Request(url.toString(), request));
+
+  // Prevent automatic redirect-follow so we can rewrite Location
+  const upstream = await fetch(new Request(url.toString(), request), { redirect: "manual" });
+
+  // If Pages tries to redirect /something.html -> /something, keep it under /c/<id>/
+  if (upstream.status >= 300 && upstream.status < 400) {
+    const location = upstream.headers.get("Location") || upstream.headers.get("location");
+    if (location && location.startsWith("/")) {
+      const headers = new Headers(upstream.headers);
+      // rewrite "/captcha" -> "/c/<id>/captcha"
+      headers.set("Location", `/c/${id}${location}`);
+      return new Response(null, { status: upstream.status, headers });
+    }
+  }
+
+  return upstream;
 }
