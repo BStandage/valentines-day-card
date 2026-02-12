@@ -1,11 +1,22 @@
 <!doctype html>
 <html lang="en">
+
 <head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GSSKTXYGFP"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'G-GSSKTXYGFP');
+  </script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Challenge</title>
   <link rel="stylesheet" href="css/app.css" />
 </head>
+
 <body class="bg-swish">
   <main class="page page--center">
     <section class="panel" role="region" aria-label="image challenge panel">
@@ -29,7 +40,9 @@
           </span>
           <span class="icon" title="Audio">
             <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
-              <path d="M12 3a7 7 0 00-7 7v7a3 3 0 003 3h1v-2H8a1 1 0 01-1-1v-7a5 5 0 0110 0v7a1 1 0 01-1 1h-1v2h1a3 3 0 003-3v-7a7 7 0 00-7-7z"></path>
+              <path
+                d="M12 3a7 7 0 00-7 7v7a3 3 0 003 3h1v-2H8a1 1 0 01-1-1v-7a5 5 0 0110 0v7a1 1 0 01-1 1h-1v2h1a3 3 0 003-3v-7a7 7 0 00-7-7z">
+              </path>
             </svg>
           </span>
           <span class="icon" title="Info">
@@ -47,4 +60,5 @@
 
   <script src="js/captcha.js"></script>
 </body>
+
 </html>

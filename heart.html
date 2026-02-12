@@ -1,11 +1,17 @@
 <!doctype html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Step Two</title>
-  <link rel="stylesheet" href="css/app.css" />
-</head>
+  <!doctype html>
+  <html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Step Two</title>
+    <link rel="stylesheet" href="css/app.css" />
+  </head>
+
 <body class="bg-swish">
   <main class="page page--center">
     <section class="heartStage" aria-label="heart game">
@@ -20,4 +26,28 @@
 
   <script src="js/heart.js"></script>
 </body>
+
+</html>
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Step Two</title>
+<link rel="stylesheet" href="css/app.css" />
+</head>
+
+<body class="bg-swish">
+  <main class="page page--center">
+    <section class="heartStage" aria-label="heart game">
+      <button id="heartBtn" class="heartBtnImg" type="button" aria-label="heart button">
+        <img id="heartImg" class="heartImg" src="assets/heart.png" alt="heart" draggable="false" />
+      </button>
+
+      <div id="burstLayer" class="burstLayer" aria-hidden="true"></div>
+      <div id="hint" class="heartHint" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <script src="js/heart.js"></script>
+</body>
+
 </html>
