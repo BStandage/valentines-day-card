@@ -4,47 +4,47 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Build Your Valentine</title>
-  <style>
-    body { font-family: system-ui, sans-serif; padding: 24px; max-width: 720px; margin: auto; }
-    h1 { margin-bottom: 8px; }
-    .row { margin: 12px 0; }
-    button { padding: 12px 18px; font-size: 16px; cursor: pointer; }
-    #result { margin-top: 16px; word-break: break-all; }
-  </style>
+  <link rel="stylesheet" href="css/app.css" />
 </head>
-<body>
-  <h1>Create Your Valentine Card</h1>
+<body class="bg-swish">
+  <main class="page page--center">
+    <section class="card" role="region" aria-label="builder">
+      <h1 class="h1">Build Your Card</h1>
+      <p class="p">Upload 1 couple photo and 9 solo photos. You’ll get a shareable link.</p>
 
-  <div class="row">
-    <label><strong>Couple photo (1)</strong></label><br>
-    <input id="couple" type="file" accept="image/*">
-  </div>
+      <div style="margin-top:16px; text-align:left;">
+        <label class="p" style="display:block; margin-bottom:8px;">Couple photo (1)</label>
+        <input id="couple" type="file" accept="image/*" />
+      </div>
 
-  <div class="row">
-    <label><strong>Your photos (9)</strong></label><br>
-    <input id="solo" type="file" accept="image/*" multiple>
-  </div>
+      <div style="margin-top:16px; text-align:left;">
+        <label class="p" style="display:block; margin-bottom:8px;">Solo photos (9)</label>
+        <input id="solo" type="file" accept="image/*" multiple />
+      </div>
 
-  <div class="row">
-    <button id="go">Generate Card</button>
-  </div>
+      <div class="row" style="margin-top:18px;">
+        <button id="go" class="btn btn--primary" type="button">Generate</button>
+        <a class="btn" href="/" rel="noopener">Back</a>
+      </div>
 
-  <div id="result"></div>
+      <div id="result" class="p" style="margin-top:16px; word-break:break-word;"></div>
+    </section>
+  </main>
 
   <script>
     const btn = document.getElementById("go");
     const result = document.getElementById("result");
 
-    btn.onclick = async () => {
+    btn.addEventListener("click", async () => {
       const couple = document.getElementById("couple").files[0];
       const solos = document.getElementById("solo").files;
 
       if (!couple) {
-        alert("Select 1 couple photo");
+        result.textContent = "Pick 1 couple photo.";
         return;
       }
       if (solos.length !== 9) {
-        alert("Select exactly 9 photos");
+        result.textContent = "Pick exactly 9 solo photos.";
         return;
       }
 
@@ -52,28 +52,26 @@
       form.append("couple", couple);
       for (const f of solos) form.append("solo", f);
 
+      btn.disabled = true;
       result.textContent = "Uploading...";
 
       try {
-        const res = await fetch("/api/create", {
-          method: "POST",
-          body: form
-        });
-
+        const res = await fetch("/api/create", { method: "POST", body: form });
         if (!res.ok) {
-          result.textContent = "Upload failed: " + (await res.text());
+          result.textContent = "Upload failed: " + await res.text();
           return;
         }
 
         const data = await res.json();
-        result.innerHTML = `
-          <p><strong>Your card is ready:</strong></p>
-          <a href="${data.url}" target="_blank">${data.url}</a>
-        `;
+        result.innerHTML =
+          `Your card is ready: <a class="btn" style="display:inline-block; margin-top:10px;" href="${data.url}" target="_blank" rel="noopener">Open link</a>` +
+          `<div style="margin-top:10px;">${data.url}</div>`;
       } catch (e) {
         result.textContent = "Error: " + e.message;
+      } finally {
+        btn.disabled = false;
       }
-    };
+    });
   </script>
 </body>
 </html>
