@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Build Your Valentine</title>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 24px; max-width: 720px; margin: auto; }
+    h1 { margin-bottom: 8px; }
+    .row { margin: 12px 0; }
+    button { padding: 12px 18px; font-size: 16px; cursor: pointer; }
+    #result { margin-top: 16px; word-break: break-all; }
+  </style>
+</head>
+<body>
+  <h1>Create Your Valentine Card</h1>
+
+  <div class="row">
+    <label><strong>Couple photo (1)</strong></label><br>
+    <input id="couple" type="file" accept="image/*">
+  </div>
+
+  <div class="row">
+    <label><strong>Your photos (9)</strong></label><br>
+    <input id="solo" type="file" accept="image/*" multiple>
+  </div>
+
+  <div class="row">
+    <button id="go">Generate Card</button>
+  </div>
+
+  <div id="result"></div>
+
+  <script>
+    const btn = document.getElementById("go");
+    const result = document.getElementById("result");
+
+    btn.onclick = async () => {
+      const couple = document.getElementById("couple").files[0];
+      const solos = document.getElementById("solo").files;
+
+      if (!couple) {
+        alert("Select 1 couple photo");
+        return;
+      }
+      if (solos.length !== 9) {
+        alert("Select exactly 9 photos");
+        return;
+      }
+
+      const form = new FormData();
+      form.append("couple", couple);
+      for (const f of solos) form.append("solo", f);
+
+      result.textContent = "Uploading...";
+
+      try {
+        const res = await fetch("/api/create", {
+          method: "POST",
+          body: form
+        });
+
+        if (!res.ok) {
+          result.textContent = "Upload failed: " + (await res.text());
+          return;
+        }
+
+        const data = await res.json();
+        result.innerHTML = `
+          <p><strong>Your card is ready:</strong></p>
+          <a href="${data.url}" target="_blank">${data.url}</a>
+        `;
+      } catch (e) {
+        result.textContent = "Error: " + e.message;
+      }
+    };
+  </script>
+</body>
+</html>
