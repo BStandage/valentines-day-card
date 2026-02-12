@@ -1,13 +1,11 @@
 <!doctype html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Yes</title>
     <link rel="stylesheet" href="css/app.css" />
 </head>
-
 <body class="bg-swish">
 
     <!-- petals behind the card -->
@@ -37,7 +35,6 @@
                     <image href="assets/couple/couple.png" x="40" y="30" width="320" height="300"
                         preserveAspectRatio="xMidYMid meet" clip-path="url(#heartClip)" />
 
-
                     <path d="M200 335
                C85 255 30 210 30 140
                C30 90 65 55 110 55
@@ -49,13 +46,41 @@
             </div>
 
             <div class="row">
-                <a class="btn" href="index.html">Replay</a>
+                <!-- Replay button now uses dynamic URL based on current path -->
+                <a id="replayBtn" class="btn" href="#">Replay</a>
             </div>
 
         </section>
     </main>
 
     <script src="js/petals.js"></script>
-</body>
+    <script>
+        // Dynamically set the Replay link to go back to this user's /c/[id]/captcha
+        document.addEventListener('DOMContentLoaded', () => {
+            const path = window.location.pathname;
 
+            // Extract id from typical paths like /c/abc123/yes or /c/abc123/yes.html
+            let id = null;
+            const parts = path.split('/').filter(Boolean); // remove empty parts
+
+            if (parts.length >= 2 && parts[0] === 'c') {
+                id = parts[1];
+            }
+
+            const replayBtn = document.getElementById('replayBtn');
+
+            if (id) {
+                // Go back to the captcha page for this specific card
+                // Use .html if your function requires it, otherwise clean URL
+                replayBtn.href = `/c/${id}/captcha`;          // clean URL (recommended)
+                // replayBtn.href = `/c/${id}/captcha.html`;  // if you need .html extension
+                replayBtn.textContent = 'Replay';
+            } else {
+                // Fallback: if no id found (rare), go to root build page
+                replayBtn.href = '/';
+                replayBtn.textContent = 'Back to Start';
+            }
+        });
+    </script>
+</body>
 </html>
