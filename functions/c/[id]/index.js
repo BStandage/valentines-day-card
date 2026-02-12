@@ -1,8 +1,17 @@
-export async function onRequest({ request, env, params }) {
-  const id = params.id;
+// functions/c/[id]/index.js
 
-  // Serve the main page while keeping /c/<id>/ in the URL
-  const url = new URL(request.url);
-  url.pathname = "/index.html";
-  return fetch(new Request(url.toString(), request));
+const ENTRY = "/index.html";
+
+export async function onRequestGet(context) {
+  const url = new URL(context.request.url);
+
+  // Ensure trailing slash (nice URLs, consistent relative behavior)
+  if (!url.pathname.endsWith("/")) {
+    url.pathname += "/";
+    return Response.redirect(url.toString(), 301);
+  }
+
+  // Serve the normal entry HTML from the static site root
+  // but *at* /c/:id/
+  return context.env.ASSETS.fetch(new Request(new URL(ENTRY, url.origin)));
 }

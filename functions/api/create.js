@@ -1,10 +1,15 @@
-export async function onRequestGet() {
-  return new Response("OK. POST multipart/form-data to /api/create", { status: 200 });
+// functions/api/create.js
+
+export function onRequestGet() {
+  return new Response(
+    "OK. POST multipart/form-data to /api/create with fields: couple (1 file), solo (9 files).",
+    { status: 200, headers: { "content-type": "text/plain; charset=utf-8" } }
+  );
 }
 
 export async function onRequestPost({ request, env }) {
   const ct = request.headers.get("content-type") || "";
-  if (!ct.toLowerCase().includes("multipart/form-data")) {
+  if (!ct.includes("multipart/form-data")) {
     return new Response("Expected multipart/form-data", { status: 400 });
   }
 
@@ -20,13 +25,11 @@ export async function onRequestPost({ request, env }) {
     return new Response("Need exactly 9 files under 'solo'", { status: 400 });
   }
 
-  // Basic size guard
-  const maxBytes = 5 * 1024 * 1024; // 5MB each
+  const maxBytes = 5 * 1024 * 1024;
   if (couple.size > maxBytes || solos.some(f => f.size > maxBytes)) {
     return new Response("One or more files too large (max 5MB each)", { status: 413 });
   }
 
-  // Simple URL-safe ID
   const id = crypto.randomUUID().replaceAll("-", "").slice(0, 12);
 
   async function put(key, file) {
@@ -38,17 +41,18 @@ export async function onRequestPost({ request, env }) {
     });
   }
 
-  // Store couple (force key name to match your frontend expectation)
+  // Store exactly like your current code expects (we'll map /assets/... in the router)
   await put(`${id}/couple/couple.png`, couple);
-
-  // Store 9 solo images mapped to 1.png..9.png keys
   for (let i = 0; i < 9; i++) {
     await put(`${id}/solo/${i + 1}.png`, solos[i]);
   }
 
-  // Optional metadata
-  await env.CARDS.put(`card:${id}`, JSON.stringify({ created: Date.now() }));
+  if (env.CARDS) {
+    await env.CARDS.put(`card:${id}`, JSON.stringify({ created: Date.now() }));
+  }
 
-  const origin = new URL(request.url).origin;
-  return Response.json({ id, url: `${origin}/c/${id}/` });
+  const url = new URL(request.url);
+  const shareUrl = `${url.origin}/c/${id}/`;
+
+  return Response.json({ id, url: shareUrl });
 }
