@@ -1,0 +1,558 @@
+:root{
+  --bg: #f4f4f4;
+  --text: #111;
+  --muted: #666;
+
+  --outerBorder: #cfcfcf;
+  --innerBorder: #e6e6e6;
+  --shadow: 0 10px 26px rgba(0,0,0,.14);
+
+  --panelRed: #e34b59;
+  --panelRed2:#d93d4c;
+
+  --primary: #e34b59;
+  --primaryBorder: #c83a46;
+  --white: #fff;
+}
+
+*{ box-sizing:border-box; }
+html,body{ height:100%; margin:0; font-family: Arial, Helvetica, sans-serif; }
+body{ background: var(--bg); color: var(--text); overflow-x: hidden; }
+
+/* ===== Swirl background (apply via <body class="bg-swish">) ===== */
+.bg-swish{
+  background:
+    radial-gradient(900px 600px at 20% 20%, rgba(255, 86, 140, 0.35), transparent 60%),
+    radial-gradient(900px 600px at 80% 20%, rgba(255, 40, 90, 0.30), transparent 60%),
+    linear-gradient(135deg, #ff5f9e, #ff2f6a, #ff6b8f);
+}
+
+.page{ min-height:100%; padding:24px; }
+.page--center{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* ===== Checkbox widget (index page) ===== */
+.widget{
+  width: 304px;
+  height: 78px;
+  background: #fff;
+  border: 1px solid var(--outerBorder);
+  border-radius: 2px;
+  box-shadow: 0 1px 0 rgba(0,0,0,.05);
+  display:flex;
+  align-items:center;
+  padding: 12px 10px;
+}
+.widgetBtn{
+  width:100%;
+  height:100%;
+  appearance:none;
+  border:none;
+  background:transparent;
+  padding:0;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  text-align:left;
+}
+.box{
+  width: 28px;
+  height: 28px;
+  border: 2px solid #c9c9c9;
+  border-radius: 2px;
+  display:grid;
+  place-items:center;
+  background:#fff;
+  flex: 0 0 auto;
+}
+.check{
+  width: 12px;
+  height: 6px;
+  border-left: 3px solid #2b7de9;
+  border-bottom: 3px solid #2b7de9;
+  transform: rotate(-45deg);
+  margin-top:-2px;
+  display: none;
+}
+.box--checked .check{ display:block; }
+
+.label{ font-size: 14px; flex: 1 1 auto; }
+.brand{
+  text-align:right;
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.2;
+  width: 90px;
+  flex: 0 0 auto;
+}
+.brandName{
+  font-size: 11px;
+  color:#333;
+  font-weight:700;
+  letter-spacing:.2px;
+  display:block;
+}
+.brandSub{ display:block; }
+
+/* ===== Captcha challenge panel ===== */
+.panel{
+  width: 452px;
+  max-width: 96vw;
+  background: #fff;
+  border: 2px solid var(--outerBorder);
+  border-radius: 2px;
+  box-shadow: var(--shadow);
+}
+
+.panelHeader,
+.panelBody,
+.panelFooter{
+  border-left: 1px solid var(--innerBorder);
+  border-right: 1px solid var(--innerBorder);
+}
+
+.panelHeader{
+  background: linear-gradient(0deg, var(--panelRed2), var(--panelRed));
+  color: #fff;
+  padding: 14px 14px 12px;
+  border-top: 1px solid var(--innerBorder);
+  border-bottom: 1px solid rgba(255,255,255,.24);
+}
+
+.panelSmall{
+  font-size: 12px;
+  font-weight: 700;
+  opacity: .95;
+  margin:0;
+}
+
+.panelTitle{
+  font-size: 30px;
+  font-weight: 800;
+  margin-top: 2px;
+  line-height: 1.05;
+  letter-spacing: -0.2px;
+}
+
+.panelSub{
+  font-size: 12px;
+  font-weight: 700;
+  opacity: .95;
+  margin-top: 6px;
+}
+
+.panelBody{
+  padding: 10px 10px 6px;
+  background:#fff;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  background: #fff;
+  padding: 2px;
+  border: 1px solid var(--innerBorder);
+}
+
+.tile{
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  background: #eee;
+  overflow:hidden;
+}
+
+.tile img{
+  width:100%;
+  height:100%;
+  object-fit: cover;
+  display:block;
+  transform: scale(1.01);
+}
+
+.badge{
+  position:absolute;
+  top: 6px;
+  left: 6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 2px solid rgba(255,255,255,.95);
+  box-shadow: 0 1px 2px rgba(0,0,0,.22);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.tile--selected .badge{ display:flex; }
+.badge svg{
+  width: 9px;
+  height: 9px;
+  display:block;
+  fill: #fff;
+}
+
+.msg{
+  font-size: 12px;
+  color: #b00020;
+  padding: 8px 2px 0;
+  min-height: 18px;
+}
+
+.panelFooter{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 10px;
+  padding: 10px 10px 10px;
+  border-top: 1px solid var(--innerBorder);
+  border-bottom: 1px solid var(--innerBorder);
+  background: #fff;
+}
+
+.icons{
+  display:flex;
+  gap: 10px;
+  align-items:center;
+  user-select:none;
+}
+.icon{
+  width: 22px;
+  height: 22px;
+  display:grid;
+  place-items:center;
+}
+.icon svg{
+  width: 18px;
+  height: 18px;
+  display:block;
+  fill: #9a9a9a;
+}
+
+.verifyBtn{
+  appearance:none;
+  border: 1px solid var(--primaryBorder);
+  background: var(--primary);
+  color: #fff;
+  font-weight: 800;
+  font-size: 12px;
+  padding: 10px 18px;
+  border-radius: 2px;
+  cursor:pointer;
+  letter-spacing: .6px;
+}
+
+@keyframes shake {
+  0%{ transform:translateX(0); }
+  20%{ transform:translateX(-8px); }
+  40%{ transform:translateX(6px); }
+  60%{ transform:translateX(-5px); }
+  80%{ transform:translateX(3px); }
+  100%{ transform:translateX(0); }
+}
+.shake{ animation: shake .42s ease; }
+
+/* ===== Shared buttons/cards ===== */
+.card{
+  width: min(720px, 96vw);
+  background: rgba(255,255,255,.16);
+  border: 1px solid rgba(255,255,255,.22);
+  box-shadow: 0 30px 90px rgba(0,0,0,.18);
+  border-radius: 18px;
+  padding: 26px;
+  text-align:center;
+  backdrop-filter: blur(10px);
+}
+
+.h1{ margin: 0 0 10px; font-size: 44px; letter-spacing:-.03em; color: rgba(255,255,255,.95); text-shadow: 0 10px 40px rgba(0,0,0,.25); }
+.p{ margin: 0 0 14px; color: rgba(255,255,255,.90); font-weight: 700; text-shadow: 0 8px 30px rgba(0,0,0,.22); }
+
+.row{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top: 14px; }
+
+.btn{
+  appearance:none;
+  border: 1px solid rgba(255,255,255,.30);
+  background: rgba(255,255,255,.14);
+  color: rgba(255,255,255,.95);
+  font-weight: 900;
+  padding: 12px 16px;
+  border-radius: 12px;
+  cursor:pointer;
+  text-decoration:none;
+  backdrop-filter: blur(10px);
+}
+.btn--primary{
+  border-color: rgba(255,255,255,.38);
+  background: rgba(255,255,255,.20);
+}
+
+/* ===== Heart page (image-based) ===== */
+.heartStage{
+  width: min(720px, 96vw);
+  height: min(560px, 78vh);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+}
+
+.heartBtnImg{
+  width: 220px;
+  height: 220px;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  cursor:pointer;
+  display:grid;
+  place-items:center;
+  transform: scale(0.9);
+  touch-action: manipulation;
+  user-select:none;
+  outline: none;
+}
+
+.heartBtnImg::-moz-focus-inner{ border:0; }
+.heartBtnImg:focus{ outline:none; }
+.heartBtnImg:disabled{ cursor: default; }
+.btn, .heartBtnImg{
+  touch-action: manipulation;
+}
+
+.heartImg{
+  width: 190px;
+  height: 190px;
+  object-fit: contain;
+  display:block;
+  user-select:none;
+  -webkit-user-drag: none;
+  background: transparent;
+  filter: drop-shadow(0 12px 22px rgba(0,0,0,.22));
+}
+
+.heartHint{
+  position:absolute;
+  bottom: 26px;
+  left: 0;
+  right: 0;
+  text-align:center;
+  color: rgba(255,255,255,.92);
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: .2px;
+  text-shadow: 0 2px 10px rgba(0,0,0,.18);
+  min-height: 18px;
+}
+
+.heartPopLong{
+  animation: heartPopLong 1100ms ease forwards;
+}
+@keyframes heartPopLong{
+  0%{ opacity: 1; filter: brightness(1); }
+  60%{ opacity: 1; filter: brightness(1.05); }
+  100%{ opacity: 0; filter: brightness(1.08); }
+}
+
+/* Confetti layer */
+.burstLayer{
+  position: fixed;
+  inset: 0;
+  display:none;
+  pointer-events:none;
+  overflow:hidden;
+  z-index: 9999;
+}
+.burstLayer.burstGo{ display:block; }
+
+.heartConfetti{
+  position:absolute;
+  width: var(--size);
+  height: var(--size);
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: heartFall var(--dur) linear forwards;
+}
+.heartConfetti img{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display:block;
+  user-select:none;
+  -webkit-user-drag: none;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,.18));
+}
+@keyframes heartFall{
+  0%{ opacity: 0; transform: translate(0, 0) rotate(0deg); }
+  8%{ opacity: 1; }
+  100%{ opacity: 0; transform: translate(var(--dx), var(--fall)) rotate(var(--rot)); }
+}
+
+/* ===== Celebrate page fade-in ===== */
+.fadeIn{
+  opacity: 0;
+  transform: translateY(14px) scale(0.99);
+  transition: opacity 700ms ease, transform 700ms ease;
+}
+.fadeIn.show{
+  opacity: 1;
+  transform: translateY(0px) scale(1);
+}
+
+
+/* ===== Yes page (transparent PNG version) ===== */
+
+.yesCard{
+  width: min(760px, 96vw);
+  background: rgba(255,255,255,.16);
+  border: 1px solid rgba(255,255,255,.22);
+  box-shadow: 0 30px 90px rgba(0,0,0,.18);
+  border-radius: 18px;
+  padding: 26px;
+  text-align:center;
+  backdrop-filter: blur(10px);
+}
+
+/* container */
+.heartFrame{
+  width: 340px;
+  height: 340px;
+  margin: 18px auto 10px;
+  position: relative;
+  display:grid;
+  place-items:center;
+}
+
+/* soft glowing heart behind image */
+.heartGlow{
+  position:absolute;
+  inset:0;
+
+  background:
+    radial-gradient(circle at 50% 55%, rgba(255,120,160,.85), rgba(255,40,90,.55) 55%, transparent 65%),
+    radial-gradient(circle at 30% 30%, rgba(255,180,210,.65), transparent 60%);
+
+  clip-path: path("M170 310 C65 230 24 185 24 122 C24 80 55 52 95 52 C124 52 148 68 170 98 C192 68 216 52 245 52 C285 52 316 80 316 122 C316 185 275 230 170 310 Z");
+
+  filter: blur(18px);
+  opacity: .9;
+}
+
+.heartPhoto{
+  position: relative;
+
+  /* shrink image inside heart */
+  width: 33%;
+  height: auto;
+  max-height: 33%;
+
+  object-fit: contain;
+  display:block;
+
+  user-select:none;
+  -webkit-user-drag: none;
+
+  filter: drop-shadow(0 18px 30px rgba(0,0,0,.28));
+}
+
+
+.heartWrap{
+  width: 340px;
+  height: 340px;
+  margin: 18px auto 10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.heartSvg{
+  width: 100%;
+  height: 100%;
+  display:block;
+  filter: drop-shadow(0 18px 34px rgba(0,0,0,.22));
+}
+
+/* Keep the Yes card above petals */
+.yesCard{
+  position: relative;
+  z-index: 20;
+}
+
+/* Petals behind card but above background */
+.petals{
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.petal{
+  position: absolute;
+  width: var(--size);
+  height: var(--size);
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: petalFall var(--dur) linear var(--delay) forwards;
+}
+
+.petal img{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display:block;
+  user-select:none;
+  -webkit-user-drag:none;
+
+  opacity: var(--op);
+  filter: blur(var(--blur)) drop-shadow(0 8px 14px rgba(0,0,0,.18));
+}
+
+@keyframes petalFall{
+  0%{
+    opacity: 0;
+    transform: translate3d(0px, 0px, 0px) rotate(var(--rot0));
+  }
+  10%{
+    opacity: 1;
+  }
+  25%{
+    transform: translate3d(calc(var(--drift) - var(--sway)), calc(var(--fall) * 0.25), 0px) rotate(calc(var(--rot0) + 0.25*(var(--rot1) - var(--rot0))));
+  }
+  50%{
+    transform: translate3d(calc(var(--drift) + var(--sway)), calc(var(--fall) * 0.50), 0px) rotate(calc(var(--rot0) + 0.50*(var(--rot1) - var(--rot0))));
+  }
+  75%{
+    transform: translate3d(calc(var(--drift) - var(--sway)), calc(var(--fall) * 0.75), 0px) rotate(calc(var(--rot0) + 0.75*(var(--rot1) - var(--rot0))));
+  }
+  100%{
+    opacity: 0;
+    transform: translate3d(var(--drift), var(--fall), 0px) rotate(var(--rot1));
+  }
+}
+
+
+/* Celebrate row with a dodging No button */
+/* No-button layout + physics layer */
+.row--no{
+  position: relative;
+}
+
+.noGhost{
+  visibility: hidden;     /* keeps its size/spot */
+  pointer-events: none;   /* never interact */
+}
+
+.noMove{
+  position: absolute;     /* we move this one */
+  left: 0;
+  top: 0;
+  will-change: transform;
+}
+

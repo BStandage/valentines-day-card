@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Valentine</title>
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body class="bg-swish">
+  <main class="page page--center">
+    <section class="card fadeIn" id="finalCard" aria-label="final message">
+      <h1 class="h1" id="titleText">Will you be my valentine?</h1>
+      <p class="p" id="subText">Happy Valentine’s Day.</p>
+
+      <div class="row row--no" id="btnRow">
+        <a class="btn btn--primary" id="yesBtn" href="yes.html">Yes</a>
+
+        <!-- Ghost: reserves the exact spot next to Yes, but never clickable/visible -->
+        <button id="noGhost" class="btn btn--no noGhost" type="button" aria-hidden="true" tabindex="-1">No</button>
+      </div>
+
+      <!-- The REAL moving No button (positioned on top of ghost slot) -->
+      <button id="noBtn" class="btn btn--no noMove" type="button">No</button>
+    </section>
+  </main>
+
+  <script src="js/celebrate.js"></script>
+  <script src="js/nope.js"></script>
+</body>
+</html>

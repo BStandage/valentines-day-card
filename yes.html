@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Yes</title>
+    <link rel="stylesheet" href="css/app.css" />
+</head>
+
+<body class="bg-swish">
+
+    <!-- petals behind the card -->
+    <div id="petals" class="petals" aria-hidden="true"></div>
+
+    <main class="page page--center">
+        <section class="yesCard fadeIn show">
+
+            <h1 class="h1">Yay.</h1>
+            <p class="p">Locked in.</p>
+
+            <div class="heartWrap">
+                <svg viewBox="0 0 400 360" class="heartSvg">
+                    <defs>
+                        <clipPath id="heartClip">
+                            <path d="M200 335
+                       C85 255 30 210 30 140
+                       C30 90 65 55 110 55
+                       C145 55 170 75 200 110
+                       C230 75 255 55 290 55
+                       C335 55 370 90 370 140
+                       C370 210 315 255 200 335 Z" />
+                        </clipPath>
+                    </defs>
+
+                    <!-- Adjust these to frame faces -->
+                    <image href="assets/couple/couple.png" x="40" y="30" width="320" height="300"
+                        preserveAspectRatio="xMidYMid meet" clip-path="url(#heartClip)" />
+
+
+                    <path d="M200 335
+               C85 255 30 210 30 140
+               C30 90 65 55 110 55
+               C145 55 170 75 200 110
+               C230 75 255 55 290 55
+               C335 55 370 90 370 140
+               C370 210 315 255 200 335 Z" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="3" />
+                </svg>
+            </div>
+
+            <div class="row">
+                <a class="btn" href="index.html">Replay</a>
+            </div>
+
+        </section>
+    </main>
+
+    <script src="js/petals.js"></script>
+</body>
+
+</html>
