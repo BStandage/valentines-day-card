@@ -1,5 +1,4 @@
-export async function onRequest({ request }) {
-  const u = new URL(request.url);
-  u.pathname = "/captcha.html";
-  return fetch(new Request(u.toString(), request));
+export async function onRequest({ params }) {
+  const id = params.id;
+  return Response.redirect(`/c/${id}/captcha.html`, 302);
 }
