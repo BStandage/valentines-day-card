@@ -1,25 +1,39 @@
+const PAGE_SET = new Set(["captcha", "heart", "celebrate", "yes"]);
+
+function injectBase(html, baseHref) {
+  // Put <base> right after <head> (or create a head if somehow missing)
+  if (/<head[^>]*>/i.test(html)) {
+    return html.replace(/<head([^>]*)>/i, `<head$1>\n  <base href="${baseHref}">`);
+  }
+  return `<!doctype html><html><head><base href="${baseHref}"></head><body>${html}</body></html>`;
+}
+
 export async function onRequest({ request, env, params }) {
   const id = params.id;
 
-  // [[path]] is an array of segments
+  // [[path]] comes in as array-of-segments (or empty)
   const segs = Array.isArray(params.path)
     ? params.path
     : (params.path ? [params.path] : []);
 
-  let rel = segs.join("/"); // e.g. "assets/solo/1.png", "captcha", "captcha.html", "css/app.css"
+  let rel = segs.join("/"); // e.g. "", "captcha", "captcha.html", "css/app.css", "assets/solo/1.png"
 
-  // If somehow no rel, serve the entry page (we’ll keep this consistent)
-  if (!rel) {
-    const u = new URL(request.url);
-    u.pathname = "/captcha.html";
-    return fetch(new Request(u.toString(), request));
+  // If they visit /c/<id>/, serve captcha (entry)
+  if (!rel) rel = "captcha";
+
+  // Normalize "pretty page" to a page name (captcha/heart/celebrate/yes)
+  // Handles /c/<id>/captcha or /c/<id>/captcha.html
+  let pageName = null;
+  if (rel.endsWith(".html")) {
+    pageName = rel.replace(/\.html$/i, "");
+  } else if (!rel.includes("/")) {
+    pageName = rel;
   }
 
-  // 1) Per-card images from R2
+  // 1) Per-card assets from R2
   if (rel.startsWith("assets/")) {
-    const r2Key = `${id}/${rel.replace(/^assets\//, "")}`;
-
-    const obj = await env.R2.get(r2Key);
+    const key = `${id}/${rel.replace(/^assets\//, "")}`;
+    const obj = await env.R2.get(key);
     if (!obj) return new Response("Not found", { status: 404 });
 
     const headers = new Headers();
@@ -29,19 +43,29 @@ export async function onRequest({ request, env, params }) {
     return new Response(obj.body, { status: 200, headers });
   }
 
-  // 2) Fix "pretty URL" pages -> actual html filenames
-  // If the browser hits /c/<id>/captcha (no extension), we MUST serve /captcha.html
-  // Same for heart/celebrate/yes.
-  if (!rel.includes(".") && !rel.endsWith("/")) {
-    const page = rel.split("/")[0]; // just in case someone does "captcha?x=1" etc.
-    if (page === "captcha" || page === "heart" || page === "celebrate" || page === "yes") {
-      rel = `${page}.html`;
-    }
+  // 2) Serve HTML pages, but INJECT <base href="/c/<id>/">
+  // This fixes CSS/JS/image paths no matter what the browser URL is.
+  if (pageName && PAGE_SET.has(pageName)) {
+    const u = new URL(request.url);
+    u.pathname = `/${pageName}.html`;
+
+    const upstream = await fetch(new Request(u.toString(), request));
+    const html = await upstream.text();
+
+    const baseHref = `/c/${id}/`;
+    const patched = injectBase(html, baseHref);
+
+    const headers = new Headers(upstream.headers);
+    headers.set("content-type", "text/html; charset=utf-8");
+    // avoid caching HTML per-id while you iterate
+    headers.set("cache-control", "no-store");
+
+    return new Response(patched, { status: upstream.status, headers });
   }
 
-  // 3) Serve static files from site root
+  // 3) Everything else (css/, js/, images not in /assets/...) -> serve from site root
+  // Example: /c/<id>/css/app.css should return /css/app.css
   const u = new URL(request.url);
   u.pathname = `/${rel}`;
-
   return fetch(new Request(u.toString(), request));
 }
