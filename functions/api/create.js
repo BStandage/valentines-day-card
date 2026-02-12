@@ -1,5 +1,3 @@
-// functions/api/create.js
-
 export function onRequestGet() {
   return new Response(
     "OK. POST multipart/form-data to /api/create with fields: couple (1 file), solo (9 files).",
@@ -8,8 +6,16 @@ export function onRequestGet() {
 }
 
 export async function onRequestPost({ request, env }) {
+  // Make binding issues obvious
+  if (!env.R2 || typeof env.R2.put !== "function") {
+    return new Response("Server misconfigured: R2 binding 'R2' not available.", { status: 500 });
+  }
+  if (!env.CARDS || typeof env.CARDS.put !== "function") {
+    return new Response("Server misconfigured: KV binding 'CARDS' not available.", { status: 500 });
+  }
+
   const ct = request.headers.get("content-type") || "";
-  if (!ct.includes("multipart/form-data")) {
+  if (!ct.toLowerCase().includes("multipart/form-data")) {
     return new Response("Expected multipart/form-data", { status: 400 });
   }
 
@@ -25,7 +31,8 @@ export async function onRequestPost({ request, env }) {
     return new Response("Need exactly 9 files under 'solo'", { status: 400 });
   }
 
-  const maxBytes = 5 * 1024 * 1024;
+  // Size guard
+  const maxBytes = 5 * 1024 * 1024; // 5MB each
   if (couple.size > maxBytes || solos.some(f => f.size > maxBytes)) {
     return new Response("One or more files too large (max 5MB each)", { status: 413 });
   }
@@ -41,18 +48,16 @@ export async function onRequestPost({ request, env }) {
     });
   }
 
-  // Store exactly like your current code expects (we'll map /assets/... in the router)
+  // Store under keys your router expects
   await put(`${id}/couple/couple.png`, couple);
   for (let i = 0; i < 9; i++) {
     await put(`${id}/solo/${i + 1}.png`, solos[i]);
   }
 
-  if (env.CARDS) {
-    await env.CARDS.put(`card:${id}`, JSON.stringify({ created: Date.now() }));
-  }
+  await env.CARDS.put(`card:${id}`, JSON.stringify({ created: Date.now() }));
 
-  const url = new URL(request.url);
-  const shareUrl = `${url.origin}/c/${id}/`;
+  // IMPORTANT: always return the *main* hostname, not a preview/hash hostname
+  const shareUrl = `https://valentines-day-card.pages.dev/c/${id}/`;
 
   return Response.json({ id, url: shareUrl });
 }
