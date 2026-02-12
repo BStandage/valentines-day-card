@@ -2,26 +2,291 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Valentine's Card</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Create Your Interactive Valentine's Day Card ❤️</title>
+  <meta name="description" content="Upload photos of you and your partner + solo shots → instantly get a beautiful, interactive Valentine's Day card to share. Perfect for surprises, confessions, or sweet messages!" />
+  
+  <!-- Open Graph / social sharing previews -->
+  <meta property="og:title" content="Create Your Interactive Valentine's Day Card ❤️" />
+  <meta property="og:description" content="Turn your favorite photos into a romantic, interactive card. Share the link and make someone's day extra special!" />
+  <meta property="og:image" content="https://valentines-day-card.pages.dev/assets/og-preview.png" />
+  <meta property="og:url" content="https://valentines-day-card.pages.dev/" />
+  <meta property="og:type" content="website" />
+
+  <!-- Google Fonts: Inter (body) + Poppins (headings) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="css/app.css" />
+  <style>
+    /* Landing-page specific enhancements */
+    .hero { text-align: center; padding: 48px 20px 32px; }
+    .hero h1 { 
+      font-family: 'Poppins', sans-serif;
+      font-size: 3.2rem; 
+      margin: 0; 
+      color: #fff; 
+      line-height: 1.1; 
+      text-shadow: 0 6px 24px rgba(0,0,0,0.45); 
+      font-weight: 700;
+    }
+    .hero p { 
+      font-family: 'Inter', sans-serif;
+      font-size: 1.35rem; 
+      color: rgba(255,255,255,0.92); 
+      max-width: 680px; 
+      margin: 20px auto 0; 
+      font-weight: 500;
+    }
+    .how-it-works {
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 24px;                    /* tightened from 28px */
+      margin: 24px auto 0;              /* reduced top/bottom margin */
+      max-width: 640px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    .how-it-works h2 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.8rem;
+      color: #fff;
+      margin: 0 0 16px;                 /* tightened bottom margin */
+      text-align: center;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      font-weight: 700;
+    }
+    .how-it-works ol {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .how-it-works li {
+      position: relative;
+      padding-left: 60px;
+      margin-bottom: 18px;              /* tightened from 24px */
+      font-size: 1.15rem;
+      color: rgba(255,255,255,0.95);
+      line-height: 1.5;
+      font-weight: 500;
+      font-family: 'Inter', sans-serif;
+    }
+    .how-it-works li:last-child { margin-bottom: 0; }
+    .step-number {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 44px;
+      height: 44px;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(227, 75, 89, 0.4);
+    }
+    .upload-area { 
+      background: rgba(255,255,255,0.12); 
+      border: 2px dashed rgba(255,255,255,0.35); 
+      border-radius: 20px; 
+      padding: 32px 24px; 
+      margin: 24px 0;                   /* tightened from 40px */
+      backdrop-filter: blur(12px); 
+    }
+    .upload-label { 
+      font-size: 1.2rem; 
+      font-weight: 700; 
+      color: #fff; 
+      margin-bottom: 12px; 
+      display: block; 
+      font-family: 'Poppins', sans-serif;
+    }
+    .preview-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); 
+      gap: 12px; 
+      margin-top: 16px; 
+    }
+    .preview-img { 
+      width: 100%; 
+      height: 90px; 
+      object-fit: cover; 
+      border-radius: 10px; 
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25); 
+      border: 1px solid rgba(255,255,255,0.2); 
+    }
+    .result-success { 
+      font-size: 1.4rem; 
+      color: #fff; 
+      margin: 24px 0; 
+      line-height: 1.5; 
+      font-family: 'Inter', sans-serif;
+    }
+    .copy-link { 
+      background: rgba(0,0,0,0.25); 
+      padding: 8px 16px; 
+      border-radius: 12px; 
+      font-family: monospace; 
+      word-break: break-all; 
+      color: #fff;
+    }
+    footer { 
+      margin-top: 64px; 
+      text-align: center; 
+      color: rgba(255,255,255,0.65); 
+      font-size: 0.9rem; 
+      line-height: 1.6; 
+      max-width: 720px; 
+      margin-left: auto; 
+      margin-right: auto; 
+      padding: 0 20px; 
+      font-family: 'Inter', sans-serif;
+    }
+    .disclaimer-strong { 
+      font-weight: 700; 
+      color: rgba(255,220,220,0.9); 
+    }
+  </style>
 </head>
 <body class="bg-swish">
   <main class="page page--center">
-    <div class="widget" role="region" aria-label="verification">
-      <button id="widgetBtn" class="widgetBtn" type="button" aria-label="I am not a robot">
-        <div class="box" id="box">
-          <div class="check" aria-hidden="true"></div>
+    <section class="card">
+      <div class="hero">
+        <h1>Create Your Interactive Valentine's Day Card 💕</h1>
+        <p>Upload your favorite photos and instantly get a beautiful, shareable card full of your memories and message. Simple, romantic, and perfect for Valentine's surprises!</p>
+
+        <div class="how-it-works">
+          <h2>How It Works</h2>
+          <ol>
+            <li>
+              <span class="step-number">1</span>
+              Upload one photo of you and your partner (the couple photo)
+            </li>
+            <li>
+              <span class="step-number">2</span>
+              Upload exactly 9 photos of yourself (square photos preferred for best look)
+            </li>
+            <li>
+              <span class="step-number">3</span>
+              Click "Create" and get your personalized interactive card link to share
+            </li>
+          </ol>
         </div>
-        <div class="label">I am not a robot</div>
-        <div class="brand" aria-hidden="true">
-          <span class="brandName">reCAPTCHA</span>
-          <span class="brandSub">Privacy - Terms</span>
-        </div>
-      </button>
-    </div>
+      </div>
+
+      <div class="upload-area">
+        <label class="upload-label" for="couple">Couple Photo (1 required)</label>
+        <input id="couple" type="file" accept="image/*" />
+
+        <div id="couple-preview" class="preview-grid"></div>
+
+        <label class="upload-label" for="solo" style="margin-top: 40px;">Photos of Yourself (exactly 9 – square preferred)</label>
+        <input id="solo" type="file" accept="image/*" multiple />
+
+        <div id="solo-preview" class="preview-grid"></div>
+      </div>
+
+      <div class="row" style="margin: 40px 0; justify-content: center;">
+        <button id="go" class="btn btn--primary" type="button" style="font-size: 1.5rem; padding: 18px 48px;">
+          Create My Card →
+        </button>
+      </div>
+
+      <div id="result" class="p" style="min-height: 120px; text-align: center;"></div>
+
+      <!-- Optional ad spot -->
+      <div style="margin: 48px 0; text-align: center; color: rgba(255,255,255,0.6); font-size: 0.95rem;">
+        <p>Supported by friends & ads 💖</p>
+      </div>
+
+      <footer>
+        <p><span class="disclaimer-strong">Important:</span> By uploading, you confirm all photos are yours or you have full permission to share them. Do NOT upload explicit, inappropriate, copyrighted, harassing, or private/third-party content (including images of minors without clear consent). We do not permanently store your images—they are used only to generate the card and may be automatically deleted shortly after. We reserve the right to remove any card that violates these rules or our guidelines. This is a fun, casual tool—no guarantees of absolute privacy, security, or availability. Use responsibly and with respect ❤️</p>
+        <p style="margin-top: 16px;">Have questions or feedback? Feel free to reach out. Enjoy spreading love!</p>
+      </footer>
+    </section>
   </main>
 
-  <script src="js/index.js"></script>
+  <script>
+    const coupleInput = document.getElementById("couple");
+    const soloInput = document.getElementById("solo");
+    const couplePreview = document.getElementById("couple-preview");
+    const soloPreview = document.getElementById("solo-preview");
+    const btn = document.getElementById("go");
+    const result = document.getElementById("result");
+
+    function createPreview(file, container) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = document.createElement("img");
+        img.src = e.target.result;
+        img.className = "preview-img";
+        container.appendChild(img);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    coupleInput.addEventListener("change", () => {
+      couplePreview.innerHTML = "";
+      if (coupleInput.files[0]) createPreview(coupleInput.files[0], couplePreview);
+    });
+
+    soloInput.addEventListener("change", () => {
+      soloPreview.innerHTML = "";
+      Array.from(soloInput.files).slice(0, 9).forEach(file => createPreview(file, soloPreview));
+    });
+
+    btn.addEventListener("click", async () => {
+      const couple = coupleInput.files[0];
+      const solos = soloInput.files;
+
+      if (!couple) {
+        result.textContent = "Please add the couple photo first! ❤️";
+        return;
+      }
+      if (solos.length !== 9) {
+        result.textContent = "Need exactly 9 photos of yourself – that's the magic number! 😉";
+        return;
+      }
+
+      const form = new FormData();
+      form.append("couple", couple);
+      for (const f of solos) form.append("solo", f);
+
+      btn.disabled = true;
+      btn.textContent = "Creating Your Card...";
+      result.innerHTML = "<div class='result-success'>Uploading your photos...<br>Almost ready! 💌</div>";
+
+      try {
+        const res = await fetch("/api/create", { method: "POST", body: form });
+        if (!res.ok) {
+          const err = await res.text();
+          throw new Error(err || "Upload failed");
+        }
+
+        const data = await res.json();
+        result.innerHTML = `
+          <div class="result-success">
+            Your interactive Valentine's card is ready! 🎉<br>
+            Share this link with someone special:
+          </div>
+          <a class="btn btn--primary" style="font-size:1.4rem; padding:16px 40px; margin:20px 0; display:inline-block;" href="${data.url}" target="_blank" rel="noopener">
+            View & Share Card
+          </a>
+          <div class="copy-link">${data.url}</div>
+          <p style="margin-top:16px;">Pro tip: Send with a sweet note like “Check this out when you have a moment 😘”</p>
+        `;
+      } catch (e) {
+        result.innerHTML = `<div style="color:#ffcccc; font-size:1.2rem;">Oops: ${e.message}</div>`;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Create My Card →";
+      }
+    });
+  </script>
 </body>
 </html>
