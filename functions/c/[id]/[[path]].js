@@ -1,17 +1,17 @@
 export async function onRequest({ request, env, params }) {
   const id = params.id;
 
-  // [[path]] is usually an array of segments
+  // [[path]] is an array of segments
   const segs = Array.isArray(params.path)
     ? params.path
     : (params.path ? [params.path] : []);
 
-  const rel = segs.join("/"); // e.g. "assets/solo/1.png", "captcha.html", "captcha", "css/app.css"
+  let rel = segs.join("/"); // e.g. "assets/solo/1.png", "captcha", "captcha.html", "css/app.css"
 
-  // If somehow called with no rel, just serve index route behavior
+  // If somehow no rel, serve the entry page (we’ll keep this consistent)
   if (!rel) {
     const u = new URL(request.url);
-    u.pathname = "/index.html";
+    u.pathname = "/captcha.html";
     return fetch(new Request(u.toString(), request));
   }
 
@@ -29,23 +29,19 @@ export async function onRequest({ request, env, params }) {
     return new Response(obj.body, { status: 200, headers });
   }
 
-  // 2) Serve static files from site root, BUT keep URL under /c/<id>/ by rewriting redirects
-  const url = new URL(request.url);
-  url.pathname = `/${rel}`;
-
-  // Prevent automatic redirect-follow so we can rewrite Location
-  const upstream = await fetch(new Request(url.toString(), request), { redirect: "manual" });
-
-  // If Pages tries to redirect /something.html -> /something, keep it under /c/<id>/
-  if (upstream.status >= 300 && upstream.status < 400) {
-    const location = upstream.headers.get("Location") || upstream.headers.get("location");
-    if (location && location.startsWith("/")) {
-      const headers = new Headers(upstream.headers);
-      // rewrite "/captcha" -> "/c/<id>/captcha"
-      headers.set("Location", `/c/${id}${location}`);
-      return new Response(null, { status: upstream.status, headers });
+  // 2) Fix "pretty URL" pages -> actual html filenames
+  // If the browser hits /c/<id>/captcha (no extension), we MUST serve /captcha.html
+  // Same for heart/celebrate/yes.
+  if (!rel.includes(".") && !rel.endsWith("/")) {
+    const page = rel.split("/")[0]; // just in case someone does "captcha?x=1" etc.
+    if (page === "captcha" || page === "heart" || page === "celebrate" || page === "yes") {
+      rel = `${page}.html`;
     }
   }
 
-  return upstream;
+  // 3) Serve static files from site root
+  const u = new URL(request.url);
+  u.pathname = `/${rel}`;
+
+  return fetch(new Request(u.toString(), request));
 }
