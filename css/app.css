@@ -15,6 +15,7 @@
   --white: #fff;
 }
 
+
 *{ box-sizing:border-box; }
 html,body{ height:100%; margin:0; font-family: Arial, Helvetica, sans-serif; }
 body{ background: var(--bg); color: var(--text); overflow-x: hidden; }
@@ -555,4 +556,3 @@ body{ background: var(--bg); color: var(--text); overflow-x: hidden; }
   top: 0;
   will-change: transform;
 }
-
